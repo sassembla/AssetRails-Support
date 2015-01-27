@@ -18,7 +18,7 @@ AssetRails has "route" units.
 The way importing sequence is defined as "import" route,
 The way bundling some assets into one AssetBundle sequence is also defined as "bundlize" route in AssetRails.  
 
-Of course you can build some pipeline for generating your own AssetBundles.
+Of course you can build some pipelines for generating AssetBundles.
 
 
 
@@ -37,8 +37,11 @@ Use for convert resources and import.
 	-d --dryrun	ドライラン
 	-i --info	詳細情報表示
 	-o --order	bundleName単位でのimportを行う。 見やすいが遅い。
-	-s --source-path	使用データパス指定
-	-e --export-path	エクスポート先パス指定
+	-s --source-path	使用データパス指定 デフォルトは PROJECT_FOLDER/Resources(AssetRails_Importable)
+	-e --export-path	追加エクスポート先パス指定
+
+
+☆cleanするまで内用はキャッシュされる（確認
 
 
 ###prefabricate
@@ -52,10 +55,11 @@ prefabを作ったり、保存したりするのに使ってください。
 
 	-d --dryrun	ドライラン
 	-i --info	詳細情報表示
-	-s --source-path	使用データパス指定
-	-e --export-path	エクスポート先パス指定
+	-s --source-path	使用データパス指定 デフォルトはimport処理のキャッシュ
+	-e --export-path	追加エクスポート先パス指定
 
 
+☆cleanするまで内用はキャッシュされる（確認
 
 ###bundlize
 bundleNameごとにAssetBundleの作成を行うことができる。
@@ -73,13 +77,15 @@ AssetBundleを作成するのに使ってください。
 	-i --info	詳細情報表示
 	-f --fast	高速化 ただしimport, prefabricate, versioningのキャッシュが消える。
 	-c --category-based-runner runnerとして Category_BundlizerBase クラスのrunnerを使用する。
-	-s --source-path	使用データパス指定
-	-e --export-path	エクスポート先パス指定
+	-s --source-path	使用データパス指定 デフォルトはprefabricate処理のキャッシュ
+	-e --export-path	追加エクスポート先パス指定 ☆マージを行う仕様だった気がする、確認
 	-o --output-memo-path	メモのアウトプット先パス指定
 
+☆cleanするまで内用はキャッシュされる（確認
 
 ###versioning
 AssetBundleをプラットフォームごとにバージョン付けし、切り出すことができる。
+デフォルトの吐き出し先は
 過去のversionを指定してAssetBundleを読み出し、新規追加分と合わせて切り出すことも可能。
 
 	... -executeMethod AssetRailsController.Versioning + options
@@ -95,10 +101,13 @@ AssetBundleをプラットフォームごとにバージョン付けし、切り
 	-x --exclude-assets	このversionに含まない、baseに含んでいるAssetBundleのnameリスト,JSON形式
 	-c --crc	crcをversionedListに含む
 	-o --output-list-path	versionedListのアウトプット先指定
-	-s --source-path	使用データパス指定
-	-e --export-path	エクスポート先パス指定
+	-s --source-path	使用データパス指定 デフォルトはbundlize処理のキャッシュ
+	-e --export-path	追加エクスポート先パス指定 ☆同様のverがすでにある場合、消して上書きする。
 
-☆別途ドキュメントが必要な気がする
+☆パラメータの組み合わせについて、別途死霊が必要。base-versionが複雑。
+☆cleanに関係なく、対象のversion/platform ペアがすでに存在すれば、消去後に吐き出す。
+☆デフォルトの吐き出し先についての記述、フォルダ絵
+
 
 ###clean
 AssetRails内のtempフォルダを消す。AssetRails内にcacheされているリソースもすべて消える。
@@ -224,3 +233,11 @@ crc = true
 ```
 
 will be equal to json version.
+
+
+##common path rule:
+The path representation which does not start with "/" is relative to PROJECT_FOLDER.
+Also can use absolute path.
+
+	e.g.
+		a/b/c => PROJECT_FOLDER/a/b/c

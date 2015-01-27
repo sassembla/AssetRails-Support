@@ -1,12 +1,13 @@
 #AssetRails Runners API Document
 
-there are some runner APIs for import, prefabricate and bundlize routes.
+there are some runner APIs for import, prefabricate and bundlize routes.  
+Some sample runners are located at PROJECT_FOLDER/Assets/AssetRails/Runners/Editor/*
 
+You can replace it by your original runners by extending "AssetRails.*Base" class.
 
 ##importer
 
 importルートで使用できる。
-AssetRails.ImporterBase クラスを拡張して定義
 
 このクラスを使わないでもimportできるけど、他のルートでもimportが発生してしまう。
 できるだけコレを使ってください。
@@ -15,7 +16,7 @@ AssetRails.ImporterBase クラスを拡張して定義
 AssetRails.ImporterBase
 
 ###Variables
-name | detail
+parameter | detail
 ---|---
 assetImporter | Reference to the asset importer.
 assetPath | The path name of the asset being imported.
@@ -82,7 +83,7 @@ nothing.
 ###Functions
 **void Prefabricate (string categoryName, string bundleName, Dictionary<string, string> resNameAndResourceLoadablePathsDict, string recommendedOutputPath)**
 
-parameter name | detail
+parameter | detail
 ---|---
 string categoryName | The category name which the importing item belongs to.
 string bundleName | The path name of the asset being imported.
@@ -160,7 +161,7 @@ nothing.
 **public override void Bundlize (string categoryName, string bundleName, Dictionary<string, string> resNameAndResourceLoadablePathsDict, Dictionary<BuildTarget, string> recommendedOutputPathDict, Dictionary<string, string> memoDict)**
 
 
-parameter name | detail
+parameter | detail
 ---|---
 string categoryName | The category name which the importing item belongs to.
 string bundleName | The path name of the asset being imported.
