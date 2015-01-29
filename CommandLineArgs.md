@@ -32,16 +32,17 @@ Use for convert resources and import.
 
 	... -executeMethod AssetRailsController.Import + options
 
-	import [-d] [-i] [-o path] [-s path] [-e path]
+	import [-d] [-i] [-u] [-o path] [-s path] [-e path]
 
-	-d --dryrun	ドライラン
-	-i --info	詳細情報表示
-	-o --order	bundleName単位でのimportを行う。 見やすいが遅い。
-	-s --source-path	使用データパス指定 デフォルトは PROJECT_FOLDER/Resources(AssetRails_Importable)
-	-e --export-path	追加エクスポート先パス指定
+	-d	--dryrun	run without do anything.
+	-i	--info	show detail in log.
+	-u	--unique	check if all resources has unique name.
+	-o	--order-by-bundle-name	set import "for each bundleName folder". it takes more time.
+	-s	--source-path	set source path of data. default is "Resources(AssetRails)".
+	-e	--export-path	set additional output path of data.
 
 
-☆cleanするまで内用はキャッシュされる（確認
+☆内容はcleanするまでキャッシュされる
 
 
 ###prefabricate
@@ -51,15 +52,17 @@ prefabを作ったり、保存したりするのに使ってください。
 
 	... -executeMethod AssetRailsController.Prefabricate + options
 
-	prefabricate [-d] [-i] [-s path] [-e path]
+	prefabricate [-d] [-i] [-u] [-s path] [-e path]
 
-	-d --dryrun	ドライラン
-	-i --info	詳細情報表示
-	-s --source-path	使用データパス指定 デフォルトはimport処理のキャッシュ
-	-e --export-path	追加エクスポート先パス指定
+	-d	--dryrun	run without do anything.
+	-i	--info	show detail in log.
+	-u	--unique	check if all resources has unique name.
+	-s	--source-path	set source path of data. default is import cache.
+	-e	--export-path	set additional output path of data.
 
 
-☆cleanするまで内用はキャッシュされる（確認
+☆内容はcleanするまでキャッシュされる
+
 
 ###bundlize
 bundleNameごとにAssetBundleの作成を行うことができる。
@@ -71,17 +74,20 @@ AssetBundleを作成するのに使ってください。
 
 	... -executeMethod AssetRailsController.Bundlize + options
 
-	bundlize [-d] [-i] [-f] [-s path] [-e path] [-o path]
+	bundlize [-d] [-i] [-u] [-f] [-c] [-o path] [-s path] [-e path]
 
-	-d --dryrun	ドライラン
-	-i --info	詳細情報表示
-	-f --fast	高速化 ただしimport, prefabricate, versioningのキャッシュが消える。
-	-c --category-based-runner runnerとして Category_BundlizerBase クラスのrunnerを使用する。
-	-s --source-path	使用データパス指定 デフォルトはprefabricate処理のキャッシュ
-	-e --export-path	追加エクスポート先パス指定 ☆マージを行う仕様だった気がする、確認
-	-o --output-memo-path	メモのアウトプット先パス指定
+	-d	--dryrun	run without do anything.
+	-i	--info	show detail in log.
+	-u	--unique	check if all AssetBundle resources has unique name.
+	-f	--fast	execute fast convert, but delete import, prefabricate, versioning cache all.
+	-c	--category-based-runner	use runner class which is Category_BundlizerBase based.
+	-o	--output-memo-path	set output path of bundlize memo file. e.g. SOMEWHERE/FILENAME.
+	-s	--source-path	set source path of data. default is prefabricate cache.
+	-e	--export-path	set additional output path of data.
 
-☆cleanするまで内用はキャッシュされる（確認
+
+☆内容はcleanするまでキャッシュされる
+
 
 ###versioning
 AssetBundleをプラットフォームごとにバージョン付けし、切り出すことができる。
@@ -90,23 +96,26 @@ AssetBundleをプラットフォームごとにバージョン付けし、切り
 
 	... -executeMethod AssetRailsController.Versioning + options
 
-	versioning [-d] [-i] [-v #] [-p str] [-f path] [-b #] [-x jsonlist] [-c] [-o path] [-s path] [-e path]
+	versioning [-d] [-i] [-v #] [-p str] [-c] [-f path] [-b #] [-x path] [-o path] [-s path] [-e path]
 
-	-d --dryrun	ドライラン
-	-i --info	詳細情報表示
-	-v --version	バージョンの指定(must)
-	-p --platform プラットフォーム指定(must)
-	-f --from-pool	デフォルト以外の読み出し元のVersionedPoolの指定
-	-b --base-version	ベースにするバージョンの指定
-	-x --exclude-assets	このversionに含まない、baseに含んでいるAssetBundleのnameリスト,JSON形式
-	-c --crc	crcをversionedListに含む
-	-o --output-list-path	versionedListのアウトプット先指定
-	-s --source-path	使用データパス指定 デフォルトはbundlize処理のキャッシュ
-	-e --export-path	追加エクスポート先パス指定 ☆同様のverがすでにある場合、消して上書きする。
+	-d	--dryrun	run without do anything.
+	-i	--info	show detail in log.
+	-v	--version	set versioning version by number.
+	-p	--platform	set versioning platform by string. e.g. "WebPlayer", "iPhone".
+	-c	--crc	use crc parameter. if crc is not contained in bundlize cache, crc will become "0".
+	-f	--from-pool-path	set the source path of another "VersionedPool(AssetRails)".
+	-b	--base-version	set base version which contained from-pool-path.
+	-x	--exclude-assets	path of JSON file. contains the list of AssetBundle names which wants to be excluded from new vesion.
+	-o	--output-list-path	set additional versioning list output path. e.g. SOMEWHERE/FILENAME.
+	-s	--source-path	set source path of data. default is bundlize cache.
+	-e	--export-path	set additional output path of data.
 
-☆パラメータの組み合わせについて、別途死霊が必要。base-versionが複雑。
+☆パラメータの組み合わせについて、別途死霊が必要。base-versionが複雑。付随してexclde
 ☆cleanに関係なく、対象のversion/platform ペアがすでに存在すれば、消去後に吐き出す。
 ☆デフォルトの吐き出し先についての記述、フォルダ絵
+
+
+
 
 
 ###clean
