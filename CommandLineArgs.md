@@ -9,25 +9,26 @@ Mac:
 
 Win:
 
-	"C:\Program Files (x86)\Unity\Editor\Unity.exe"
+	"C:\Program Files (x86)\Unity\Editor\Unity.exe" -quit -projectPath "PROJECT_FOLDER_PATH" -executeMethod AssetRailsController.Import
 
 
 ##about Route:
 
-AssetRails has "route" units.  
-The way importing sequence is defined as "import" route,
-The way bundling some assets into one AssetBundle sequence is also defined as "bundlize" route in AssetRails.  
+AssetRails has the unit called "route".  
+"Import resource" function is defined as "import" route,
+"bundling some assets into one AssetBundle" function is also defined as "bundlize" route in AssetRails.  
 
-Of course you can build some pipelines for generating AssetBundles.
-
-
+Of course you can build some route-pipelines for generating AssetBundles.
 
 
-###import
+
+
+##import
 Importing resources from outside of Unity to inside.
 Use for convert resources and import.
-デフォルトの読み込み元フォルダは PROJECT_FOLDER/Resources(AssetRails_Importable) です
-☆import処理を記述するランナーはこちら
+
+The default source folder of import route is  
+"PROJECT_FOLDER/Resources(AssetRails)".
 
 
 	... -executeMethod AssetRailsController.Import + options
@@ -41,14 +42,13 @@ Use for convert resources and import.
 	-s	--source-path	set source path of data. default is "Resources(AssetRails)".
 	-e	--export-path	set additional output path of data.
 
+####runner for import
+[importer](https://github.com/sassembla/AssetRails-Support/blob/master/RunnersAPIDocument.md#importer)
 
-☆内容はcleanするまでキャッシュされる
 
 
-###prefabricate
-bundleNameごとにprefabの作成などが行える。
-prefabを作ったり、保存したりするのに使ってください。
-☆prefabricate処理を記述するランナーはこちら
+##prefabricate
+Generate prefabs for each bundleName.
 
 	... -executeMethod AssetRailsController.Prefabricate + options
 
@@ -60,17 +60,14 @@ prefabを作ったり、保存したりするのに使ってください。
 	-s	--source-path	set source path of data. default is import cache.
 	-e	--export-path	set additional output path of data.
 
+####runner for prefabricate
+[prefabricator](https://github.com/sassembla/AssetRails-Support/blob/master/RunnersAPIDocument.md#prefabricator)
 
-☆内容はcleanするまでキャッシュされる
 
+##bundlize
+Can Generate AssetBundles for each bundleName.
 
-###bundlize
-bundleNameごとにAssetBundleの作成を行うことができる。
-AssetBundleを作成するのに使ってください。
-複数プラットフォームのAssetBundleの同時作成が高速に行える。
-サイズ、crcを自動的に記録する機能がある。
-高速化モードあり。
-☆bundlize処理を記述するランナーはこちら
+The sizes & crcs are automatically recorded.
 
 	... -executeMethod AssetRailsController.Bundlize + options
 
@@ -85,14 +82,17 @@ AssetBundleを作成するのに使ってください。
 	-s	--source-path	set source path of data. default is prefabricate cache.
 	-e	--export-path	set additional output path of data.
 
+####runner for bundlize
+[bundlizer](https://github.com/sassembla/AssetRails-Support/blob/master/RunnersAPIDocument.md#bundlizer)
 
-☆内容はcleanするまでキャッシュされる
 
+##versioning
+Pool & Pick up generated AssetBundles as version.
 
-###versioning
-AssetBundleをプラットフォームごとにバージョン付けし、切り出すことができる。
-デフォルトの吐き出し先は
-過去のversionを指定してAssetBundleを読み出し、新規追加分と合わせて切り出すことも可能。
+The default output place is  
+"PROJECT_FOLDER/VersionedPool(AssetRails)"
+
+You can also pick up old-versioned AssetBundles as a part of new versioned AssetBundles.
 
 	... -executeMethod AssetRailsController.Versioning + options
 
@@ -110,46 +110,51 @@ AssetBundleをプラットフォームごとにバージョン付けし、切り
 	-s	--source-path	set source path of data. default is bundlize cache.
 	-e	--export-path	set additional output path of data.
 
-☆パラメータの組み合わせについて、別途死霊が必要。base-versionが複雑。付随してexclde
-☆cleanに関係なく、対象のversion/platform ペアがすでに存在すれば、消去後に吐き出す。
-☆デフォルトの吐き出し先についての記述、フォルダ絵
+"versioning" & "bundlize" prepares for generating & driving with AssetBundles.
+
+Although! you can generate "Not" AssetBundle format and pool these data files.
+
+####versioning in deep
+[Versioning & driving bundled datas](https://github.com/sassembla/AssetRails-Support/blob/master/Versioning.md)
 
 
 
 
 
-###clean
-AssetRails内のtempフォルダを消す。AssetRails内にcacheされているリソースもすべて消える。
+##clean
+Delete all datas and caches under AssetRails contorol.
+If you want to clean all datas inside AssetRails but want to use "already imported" data, should use -s --source-path & -e --export-path options of import | prefabricate | bundlize | versioning routes.
 
 	... -executeMethod AssetRailsController.Clean
 
 
-###setup
-UnityEditorの動作するプラットフォームを切り替える
+##setup
+Switch editor-running platforms.
 
 	... -executeMethod AssetRailsController.Setup + options
 
 	setup [-w str]
 
-	-w --work-platform	動作するプラットフォームを切り替える
+	-w --work-platform	change editor platform to specified.
+	
 
-###teardown
-AssetRailsを強制終了させる。
+##teardown
+Force quit AssetRails.
 
 	... -executeMethod AssetRailsController.Teardown
 
 
-#Running multiple route in order
+#Running multiple routes in order
 
 ###runjson
-jsonで複数のルートを通る
+Construct pipeline of routes by json.
 
 	... -executeMethod AssetRailsController.RunJson + options
 
 	runjson [-f path] [-c json]
 
-	-f --file-path	JSONで書かれたプランファイルを実行する
-	-c --contents	JSONで書かれたプランを実行する
+	-f --file-path	run json file.
+	-c --contents	directory run JSON format string.
 
 ####the plan file written in Json:
 run clean -> import -> prefabricate -> bundlize -> versioning iOS & Android AssetBundles.
@@ -192,14 +197,14 @@ plan.json
 ```
 
 
-###runtoml(experimental)
-tomlでのプランニングと動作
+##runtoml(experimental)
+Construct pipeline of routes by toml.
 
 	... -executeMethod AssetRailsController.RunToml + options
 
 	runtoml [-f path]
 
-	-f --file-path	Tomlで書かれたプランファイルを実行する
+	-f --file-path	run toml file.
 
 
 
@@ -250,3 +255,5 @@ Also can use absolute path.
 
 	e.g.
 		a/b/c => PROJECT_FOLDER/a/b/c
+		
+		/a/b/c => /a/b/c

@@ -3,17 +3,16 @@
 there are some runner APIs for import, prefabricate and bundlize routes.  
 Some sample runners are located at PROJECT_FOLDER/Assets/AssetRails/Runners/Editor/*
 
-You can replace it by your original runners by extending "AssetRails.*Base" class.
+You can replace it by your original runner script by extending "AssetRails.*Base" class.
 
 ##importer
 
-importルートで使用できる。
-
-このクラスを使わないでもimportできるけど、他のルートでもimportが発生してしまう。
-できるだけコレを使ってください。
+Uses in "import" route.
 
 ###Should extends
 AssetRails.ImporterBase
+
+(Also you can use import API of Unity's default, but in AssetRails please use this class.)
 
 ###Variables
 parameter | detail
@@ -71,8 +70,8 @@ You can use these parameters for running import process to the resource.
 
 ##prefabricator
 
-prefabricateルートで使用できる。importが済んだ素材を、bundleName単位で扱うことが出来る。
-prefabを作ったり、保存したりするのに使ってください。
+Uses in "prefabricate" route.
+You can generate prefabs and others.
 
 ###Should extends
 AssetRails.PrefabricatorBase
@@ -144,15 +143,23 @@ The YOUR_PREFAB_NAME.prefab will be generated and results will like below.
 
 ##bundlizer
 
-bundlizerルートで使用できる。importやprefabricateが済んだ素材を、bundleName単位で扱うことが出来る。
-様々なプラットフォームのAssetBundleを作るのに使ってください。
-AssetBundleを作成するには、 AssetRailsBuildPipeline class のメソッドを使用してください。
-ただし、bundleName単位でしか扱わないため、
-Push,Popを用いた、category全体で共有したいAssetBundleの作成には不向きです。
-そういうことがしたい場合、-c --category オプションを使って実行される、category_bundlizer runner を使用してください。
+Uses in "bundlize" route.
+Take imported or imported + prefabricated resources for each bundleName units.
+
+Please use AssetRailsBuildPipeline class methods for making AssetBundles. It's thin wrapper for Unity's default.
+
+Supports making AssetBundles for multi platforms faster & easier than using Unity's default API.
+* Record crc & parts data of AssetBundle in cache.
+* Switching platforms in making AssetBundles very fast.
+
+
+By default, "bundlizer" treats resources for each bundleName folder.
+If you want to use Push/Pop between bundleName, use -c --category option.
+Under this option, "bundlize" route uses Category_BundlizerBase extends runners instead of BundlizerBase based one.
+
 
 ###Should extends
-AssetRails.BundlizerBase
+AssetRails.BundlizerBase  
 
 ###Variables
 nothing.
@@ -220,7 +227,7 @@ resource name| resource loadable path
 chara | characters/chara01/chara
 chara_cube | characters/chara01/chara_cube
 
-Our reccomendation to use "resNameAndResourceLoadablePathsDict" is getting resource loadable path easily for load resource via UnityEngine.Resources.Load(resource loadable path).
+The parameter "resNameAndResourceLoadablePathsDict" is getting resource loadable path easily for load resource via UnityEngine.Resources.Load(resourceLoadablePath).
 
 
 The **recommendedOutputPathDict** parameter will contains these key-value parameters.
@@ -233,21 +240,24 @@ Android | SOMEWHERE/Android
 and more platforms... | SOMEWHERE/platforms...
 
 
-☆AssetBundleの情報を自動的に作成する。
-☆crc付きの奴を使えば、crcも保存される。 メソッドとして使うだけでOKで、コード中で使う必要は無い、んだけどこの辺どう説明すれば、、、
+Note that if you want to use crc, plaease use   "AssetRailsBuildPipeline.BuildAssetBundle with crc"  
+or  
+"AssetRailsBuildPipeline.BuildAssetBundleExplicitAssetNames with crc"  
+method.
 
-☆メモも取れるので、特に何かパラメータを出力したい場合、使うと良いと思う。
-you can use "memoDict" param as some memo dictionary for you.
+but you don't need to record crc parameter.
+There methods records the crc parameter automatically.
+
+You can use "memoDict" param as some memo dictionary for your way.
 will be output "Bundlize" + -o or --output-memo-path option.
 
-
-こっから先は、実際のbundle作りを書く。
-
-
+sample bundlizer code are below:
 
 
 ##category_bundlizer
-bundlizerルートで-c --categoryを設定した場合に使用できる。
-importやprefabricateが済んだ素材を、category単位でAssetBundle生成に使用することが出来る。
 
-☆とかなんだけど、まだ未定。
+category単位でbundlizeを行う。category内のbundleNameでPush/Popを使って組み合わせることが出来ると思う。
+
+
+###Should extends
+AssetRails.Category_BundlizerBase

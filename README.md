@@ -1,12 +1,18 @@
-#AssetRails Overview and the caution
+#AssetRails Overview
 
 what is this:  
 -> the tool for generating AssetBundle.
 
 
-##Generate AssetBundle using command line
+##Generate AssetBundles from data
+☆PROJECT_FOLDER/Resources(AssetRails) からAssetBundleを作り、PROJECT_FOLDER/VersionedPool(AssetRails)に貯蓄する。
+☆Resources(AssetRails)内のフォルダ構造と、VersionedPool(AssetRails)の構造をbefore -> afterみたいに表示したい。
+
+
+
+##using command line
 AssetRails can run with command line.
-	APIドキュメントへのリンク付ける。
+
 
 ##"Routes" and "Runners"
 ☆素材のimport, prefab作成、bundle化、などを個別に実行可能
