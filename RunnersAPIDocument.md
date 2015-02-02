@@ -66,6 +66,8 @@ also **assetPath** will be "**Assets/SOMEWHERE/characters/chara01/chara.png**".
 
 You can use these parameters for running import process to the resource.
 
+###sample code
+☆
 
 
 ##prefabricator
@@ -138,8 +140,8 @@ The YOUR_PREFAB_NAME.prefab will be generated and results will like below.
 	SOMEWHERE_PREFABRICATED/characters/chara01/chara_basement.png
 	SOMEWHERE_PREFABRICATED/characters/chara01/YOUR_PREFAB_NAME.prefab
 
-
-
+###sample code
+☆
 
 ##bundlizer
 
@@ -245,19 +247,25 @@ or
 "AssetRailsBuildPipeline.BuildAssetBundleExplicitAssetNames with crc"  
 method.
 
-but you don't need to record crc parameter.
-There methods records the crc parameter automatically.
+but you don't need to record crc parameter by yourself.
+These methods records the crc parameter automatically.
 
-You can use "memoDict" param as some memo dictionary for your way.
+You can use "memoDict" param as some memo dictionary.
 will be output "Bundlize" + -o or --output-memo-path option.
 
-sample bundlizer code are below:
-
+###sample code
+☆
 
 ##category_bundlizer
 
-category単位でbundlizeを行う。category内のbundleNameでPush/Popを使って組み合わせることが出来ると思う。
+Run bundlize for each "category".
+You can use "PushAssetDependencies" & "PopAssetDependencies" for constructing dependencies of each AssetBundle-sources in every bundleName folders.
+
 
 
 ###Should extends
 AssetRails.Category_BundlizerBase
+
+
+###sample code
+☆
