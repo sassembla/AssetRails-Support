@@ -110,10 +110,6 @@ You can also pick up old-versioned AssetBundles as a part of new versioned Asset
 	-s	--source-path	set source path of data. default is bundlize cache.
 	-e	--export-path	set additional output path of data.
 
-"versioning" & "bundlize" prepares for generating & driving with AssetBundles.
-
-Although! you can generate "Not" AssetBundle format and pool these data files.
-
 ####versioning in deep
 [Versioning & driving bundled datas](https://github.com/sassembla/AssetRails-Support/blob/master/Versioning.md)
 
@@ -257,3 +253,8 @@ Also can use absolute path.
 		a/b/c => PROJECT_FOLDER/a/b/c
 		
 		/a/b/c => /a/b/c
+		
+##Not only for AssetBundle, Use another format.
+Specially "versioning" & "bundlize" has the functionality for generating & driving with AssetBundles(of Unity).
+
+Although, you can generate "Not" AssetBundle format and pool these data files.
