@@ -1,0 +1,8 @@
+
+*.meta
+
+Samples/AssetBundleReaderProject/Assets/SublimeSocketAsset/*
+
+Samples/AssetBundleReaderProject/Library/*
+Samples/AssetBundleReaderProject/Temp/*
+

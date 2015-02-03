@@ -22,7 +22,7 @@ class AssetBundleCacheLoader {
 		System.Action<string, T> succeeded,
 		System.Action<string, string> failed) where T : UnityEngine.Object {
 
-		Debug.Log("start LoadCachedBundle2 for Resource:" + resourceName + " from bundleName:" + bundleName);
+		Debug.Log("start LoadCachedBundle for Resource:" + resourceName + " from bundleName:" + bundleName);
 
 		/*
 			wait if marked as loading.
