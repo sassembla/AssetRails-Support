@@ -6,7 +6,7 @@ using System.Collections.Generic;
 class BundleData {
 	public readonly string bundleName;
 	public readonly int size;
-	public readonly int version;
+	public readonly int revision;
 	public readonly uint crc;
 	public readonly List<string> resourceNames;
 
@@ -14,7 +14,7 @@ class BundleData {
 		
 		bundleName = (string)source["bundleName"];
 		var sizeResult = int.TryParse(source["size"].ToString(), out size);
-		var versionResult = int.TryParse(source["version"].ToString(), out version);
+		var revisionResult = int.TryParse(source["revision"].ToString(), out revision);
 		var crcResult = uint.TryParse(source["crc"].ToString(), out crc);
 		
 		var resNameBaseList = source["resourceNames"] as List<System.Object>;
@@ -26,7 +26,7 @@ class BundleData {
 		}
 		resourceNames = new List<string>(resNameBaseStrList);
 
-		if (sizeResult && versionResult && crcResult) {}
-		else Debug.Log("sizeResult:" + sizeResult + " versionResult:" + versionResult + " crcResult:" + crcResult);
+		if (sizeResult && revisionResult && crcResult) {}
+		else Debug.Log("sizeResult:" + sizeResult + " revisionResult:" + revisionResult + " crcResult:" + crcResult);
 	}
 }

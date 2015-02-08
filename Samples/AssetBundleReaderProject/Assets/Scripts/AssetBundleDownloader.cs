@@ -19,8 +19,11 @@ public class AssetBundleDownloader : MonoBehaviour {
 	// AssetBundle downloadable path.
 	public const string assetBundlePath = "VersionedPool(AssetRails)/";
 
-	// download version of AssetBundles.
-	public const int version = 1;
+	// url part of getting AssetBundle path. not equal to "version"　parameter of "LoadFromCacheOrDownload" API. only set to "1" for download-url of AssetBundles.
+	public const int urlVersion = 1;
+
+	// the version parameter for Unity's "LoadFromCacheOrDownload" API. this parameter never changes because of "version param in LoadFromCacheOrDownload API is NOT for versioning. it's slot.".
+	public const int FIXED_CACHED_SLOT_VERSION = 1;
 
 	// fileName of versionedList.json
 	public const string listName = "versionedList.JSON";
@@ -96,30 +99,28 @@ public class AssetBundleDownloader : MonoBehaviour {
 	IEnumerator DownloadAssetBundleThenCache (BundleData bundleData, Action<string> completed) {
 		var bundleName = bundleData.bundleName;
 		string url = GetFileProtocolUrlForAssetBundle(bundleName);
-		int version = bundleData.version;
 		uint crc = bundleData.crc;
 
 		// get AssetBundle from file path.
-		var www = WWW.LoadFromCacheOrDownload(url, version, crc);
+		using (var www = WWW.LoadFromCacheOrDownload(url, FIXED_CACHED_SLOT_VERSION, crc)) {// use fixed version parameter. it's not version, only SLOT.
+			yield return www;
 
-		yield return www;
+			if (!String.IsNullOrEmpty(www.error)) {
+				Debug.LogError("DownloadAssetBundleThenCache www.error:" + www.error);
+				yield break;
+			}
 
-		if (!String.IsNullOrEmpty(www.error)) {
-			Debug.LogError("DownloadAssetBundleThenCache www.error:" + www.error);
-			yield break;
+			var assetBundle = www.assetBundle;
+
+			// release AssetBundle resource now.
+			assetBundle.Unload(false);
 		}
-		
-		while (!Caching.IsVersionCached(url, version)) {
+
+		while (!Caching.IsVersionCached(url, FIXED_CACHED_SLOT_VERSION)) {// use fixed version parameter. it's not version, only SLOT.
 			// wait for cached.
 			yield return null;
 		}
-		var assetBundle = www.assetBundle;
-
-		// release AssetBundle resource now.
-		assetBundle.Unload(false);
-
-		www.Dispose();
-
+		
 		completed(bundleName);
 	}
 
@@ -137,7 +138,6 @@ public class AssetBundleDownloader : MonoBehaviour {
 		StartCoroutine(AssetBundleCacheLoader.LoadCachedBundle(
 			characterResourceHero,
 			cachedAssetBundleDict[characterResourceHero].resourceNames[2],// hero_prefab.prefab
-			cachedAssetBundleDict[characterResourceHero].version,
 			cachedAssetBundleDict[characterResourceHero].crc,
 
 			(string loadSucceededResourceName, GameObject prefab) => {
@@ -154,7 +154,6 @@ public class AssetBundleDownloader : MonoBehaviour {
 		StartCoroutine(AssetBundleCacheLoader.LoadCachedBundle(
 			characterResourceEnemy,
 			cachedAssetBundleDict[characterResourceEnemy].resourceNames[2],// enemy_prefab.prefab
-			cachedAssetBundleDict[characterResourceEnemy].version,
 			cachedAssetBundleDict[characterResourceEnemy].crc,
 
 			(string loadSucceededResourceName, GameObject prefab) => {
@@ -176,7 +175,6 @@ public class AssetBundleDownloader : MonoBehaviour {
 		StartCoroutine(AssetBundleCacheLoader.LoadCachedBundle(
 			imageResource1,
 			cachedAssetBundleDict[imageResource1].resourceNames[0],// main.jpg
-			cachedAssetBundleDict[imageResource1].version,
 			cachedAssetBundleDict[imageResource1].crc,
 
 			(string loadSucceededResourceName, Texture2D t) => {
@@ -194,7 +192,6 @@ public class AssetBundleDownloader : MonoBehaviour {
 		StartCoroutine(AssetBundleCacheLoader.LoadCachedBundle(
 			imageResource2,
 			cachedAssetBundleDict[imageResource2].resourceNames[0],// main.jpg
-			cachedAssetBundleDict[imageResource2].version,
 			cachedAssetBundleDict[imageResource2].crc,
 
 			(string loadSucceededResourceName, Texture2D t) => {
@@ -216,7 +213,6 @@ public class AssetBundleDownloader : MonoBehaviour {
 		StartCoroutine(AssetBundleCacheLoader.LoadCachedBundle(
 			modelResource1,
 			cachedAssetBundleDict[modelResource1].resourceNames[0],// sushi.fbx
-			cachedAssetBundleDict[modelResource1].version,
 			cachedAssetBundleDict[modelResource1].crc,
 
 			(string loadSucceededResourceName, GameObject model) => {
@@ -233,7 +229,6 @@ public class AssetBundleDownloader : MonoBehaviour {
 		StartCoroutine(AssetBundleCacheLoader.LoadCachedBundle(
 			modelResource2,
 			cachedAssetBundleDict[modelResource2].resourceNames[0],// gunkan.fbx
-			cachedAssetBundleDict[modelResource2].version,
 			cachedAssetBundleDict[modelResource2].crc,
 
 			(string loadSucceededResourceName, GameObject model) => {
@@ -258,7 +253,7 @@ public class AssetBundleDownloader : MonoBehaviour {
 			 + CombineAllPath(
 			 	projectPath, 
 			 	AssetBundleDownloader.assetBundlePath, 
-			 	AssetBundleDownloader.version.ToString(),
+			 	AssetBundleDownloader.urlVersion.ToString(),
 			 	currentPlatformStr,
 			 	bundleName
 			 );
@@ -272,9 +267,10 @@ public class AssetBundleDownloader : MonoBehaviour {
 		var currentPlatformStr = PLATFORM_STR;
 		
 		return AssetBundleDownloader.fileProtocolStr
-			 + CombineAllPath(projectPath, 
+			 + CombineAllPath(
+			 	projectPath, 
 			 	AssetBundleDownloader.assetBundlePath, 
-			 	AssetBundleDownloader.version.ToString(),
+			 	AssetBundleDownloader.urlVersion.ToString(),
 			 	currentPlatformStr,
 			 	AssetBundleDownloader.listName
 			 );

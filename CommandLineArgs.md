@@ -67,7 +67,10 @@ Generate prefabs for each bundleName.
 ##bundlize
 Can Generate AssetBundles for each bundleName.
 
-The sizes & crcs are automatically recorded.
+The sizes & crcs of AssetBundles are automatically recorded.
+
+This "size" parameter is the size of AssetBundle file.
+When you set 	BuildAssetBundleOptions.UncompressedAssetBundle option at generate AssetBundle, 
 
 	... -executeMethod AssetRailsController.Bundlize + options
 
@@ -76,6 +79,7 @@ The sizes & crcs are automatically recorded.
 	-d	--dryrun	run without do anything.
 	-i	--info	show detail in log.
 	-u	--unique	check if all AssetBundle resources has unique name.
+	-a	--actual-size add the size parameter of the actual(uncompressed) AssetBundle's size to bundlizer result.
 	-f	--fast	execute fast convert, but delete import, prefabricate, versioning cache all.
 	-c	--category-based-runner	use runner class which is Category_BundlizerBase based.
 	-o	--output-memo-path	set output path of bundlize memo file. e.g. SOMEWHERE/FILENAME.

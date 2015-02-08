@@ -17,7 +17,6 @@ class AssetBundleCacheLoader {
 	public static IEnumerator LoadCachedBundle <T> (
 		string bundleName,
 		string resourceName,
-		int version,
 		uint crc,
 		System.Action<string, T> succeeded,
 		System.Action<string, string> failed) where T : UnityEngine.Object {
@@ -53,7 +52,7 @@ class AssetBundleCacheLoader {
 
 		string url = AssetBundleDownloader.GetFileProtocolUrlForAssetBundle(bundleName);
 		
-		var isCached = Caching.IsVersionCached(url, version);
+		var isCached = Caching.IsVersionCached(url, AssetBundleDownloader.FIXED_CACHED_SLOT_VERSION);// use fixed version parameter. it's not version, this is SLOT.
 		if (!isCached) {
 			failed(resourceName, "assetBundle-not-cached:" + url + " maybe expired.");
 			yield break;
@@ -62,24 +61,27 @@ class AssetBundleCacheLoader {
 		// start loading from Unity's AssetBundle cache. set loading mark.
 		cachedAssetBundleLoadingList.Add(bundleName);
 		
-		WWW www = WWW.LoadFromCacheOrDownload(url, version, crc);
-		yield return www;
+		using (var www = WWW.LoadFromCacheOrDownload(url, AssetBundleDownloader.FIXED_CACHED_SLOT_VERSION, crc)) {// use fixed version parameter. it's not version, this is SLOT.
+			yield return www;
 
-		if (!String.IsNullOrEmpty(www.error)) {
+			if (!String.IsNullOrEmpty(www.error)) {
+				if (cachedAssetBundleLoadingList.Contains(bundleName)) cachedAssetBundleLoadingList.Remove(bundleName);
+				failed(resourceName, "www-error:" + www.error);
+				yield break;
+			}
+		
+		
+			// remove loading mark.
 			if (cachedAssetBundleLoadingList.Contains(bundleName)) cachedAssetBundleLoadingList.Remove(bundleName);
-			failed(resourceName, "www-error:" + www.error);
-			yield break;
+
+			var assetBundle2 = www.assetBundle;
+
+			// set to on-memory cache
+			onMemoryAssetBundleDict[bundleName] = assetBundle2;
 		}
 		
-		// remove loading mark.
-		if (cachedAssetBundleLoadingList.Contains(bundleName)) cachedAssetBundleLoadingList.Remove(bundleName);
-
-		var assetBundle2 = www.assetBundle;
 		
-		// set to on memory cache
-		onMemoryAssetBundleDict[bundleName] = assetBundle2;
-
-		var loadedResource2 = (T)assetBundle2.Load(resourceName, typeof(T));
+		var loadedResource2 = (T)onMemoryAssetBundleDict[bundleName].Load(resourceName, typeof(T));
 		
 		if (loadedResource2 == null) {
 			if (cachedAssetBundleLoadingList.Contains(bundleName)) cachedAssetBundleLoadingList.Remove(bundleName);
