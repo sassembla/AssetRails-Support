@@ -3,16 +3,15 @@
 what is this:  
 -> Generating AssetBundles from **command line** and CI(e.g. Jenkins).
 
-![jenkins](https://raw.githubusercontent.com/sassembla/AssetRails-Support/masterwebInterface.png "jenkins")
+![jenkins](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/webInterface.png "jenkins")
 
-##use command line
-AssetRails can run from command line.
+##as command line tool
 
 Like this.
 
 	/Applications/Unity/Unity.app/Contents/MacOS/Unity -batchmode\
 	 -quit -projectPath $(pwd)\
-	 -executeMethod AssetRailsController.Import
+	 -executeMethod AssetRailsController.Bundlize
 
 
 [command line args](https://github.com/sassembla/AssetRails-Support/blob/master/CommandLineArgs.md#assetrails-command-line-args)
@@ -28,15 +27,16 @@ Supported format is json & toml(experimental).
 You can programming it's runner.
 
 
-##Web console & Jenkins job
-☆Console でブラウザから実行状態が確認できる
-☆画像
-* you can run Jenkins job from AssetRails Console.
+##Web console & run Jenkins job
+AssetRails has browser interface.  
+![jenkins](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/webInterface.png "jenkins")
+
+Also you can run Jenkins job from AssetRails Console if AssetRails is under the Jenkins.
 
 
 
 ##folder format supported
-Below is basic. but you can import your own prefabs and all Unity supported files,
+Below is default folder format for AssetRails. but you can import your own data format which is supported by Unity,
 
 also **.meta** files too.
 
@@ -46,7 +46,7 @@ also **.meta** files too.
 ##manage AssetBundles
 ###Generate AssetBundle-data-list by versioning.
 
-e.g.
+versionedList.json
 
     {
         "versioned": 1,
@@ -79,12 +79,12 @@ e.g.
 full example is in [Sample project](https://github.com/sassembla/AssetRails-Support/tree/master/Samples/AssetBundleReaderProject).
 
 ###fast multi platform bundlize & manage support 
-generate & hold versioned-AssetBundles for each platform.
+Generate & hold versioned-AssetBundles for each platform.
 
 ###use inherited AssetBundles supported.
-You can use new version of versioned-AssetBundles group with old versioned-AssetBundles.
+You can generate new versioned-AssetBundles group with old versioned-AssetBundles.
 
-e.g.
+below example will generate new version 2 versiond-AssetBundles from version 1's AssetBundles and new AssetBundlse.
 
 	/Applications/Unity/Unity.app/Contents/MacOS/Unity -batchmode\
 	 -quit -projectPath $(pwd)\
@@ -94,11 +94,14 @@ e.g.
 see [versioning in deep](https://github.com/sassembla/AssetRails-Support/blob/master/Versioning.md#versioning-in-deep).
 
 
+#Future
+* Unity5 is beta support. but You can use this Asset with Unity 5's new feature, maybe.
+
 
 #Caution
-* AssetRails can only run under メタがでてくるモード。
-* This Asset is not for generating AssetBundles without Unity Pro license.
-* Unity5 is beta support.
+* AssetRails can only run under "External Version Control Support = isible Meta Files".
+* This Asset is **not** for generating AssetBundles without Unity Pro license.
+
 
 
 ##Online Support
