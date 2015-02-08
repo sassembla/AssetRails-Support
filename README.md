@@ -1,25 +1,29 @@
 #AssetRails Overview
 
 what is this:  
--> the tool for generating AssetBundle.
+-> Generating AssetBundles from **command line** and CI(e.g. Jenkins).
+
+![jenkins](https://raw.githubusercontent.com/sassembla/AssetRails-Support/masterwebInterface.png "jenkins")
+
+##use command line
+AssetRails can run from command line.
+
+Like this.
+
+	/Applications/Unity/Unity.app/Contents/MacOS/Unity -batchmode\
+	 -quit -projectPath $(pwd)\
+	 -executeMethod AssetRailsController.Import
 
 
-##Generate AssetBundles from data gradually.
+[command line args](https://github.com/sassembla/AssetRails-Support/blob/master/CommandLineArgs.md#assetrails-command-line-args)
 
-![Qiita](http://qiita.com/icons/favicons/public/apple-touch-icon.png "Qiita")
+##build pipeline
+You can construct pipeline which called "route".
 
-
-##using command line
-AssetRails can run with command line.
-
-
-##"Routes" and "Runners"
-☆素材のimport, prefab作成、bundle化、などを個別に実行可能
-☆同じrouteでも設定が異なる処理を走らせられる。
+* import, prefabricate, bundlize, versioning.
 * Run multiple routes in order.
 Supported format is json & toml(experimental).
-☆各routeでの素材のexportが可能。
-Unity Editor上で途中経過を確認できる。
+
 * AssetRails has Runner-API for each route.
 You can programming it's runner.
 
@@ -30,22 +34,71 @@ You can programming it's runner.
 * you can run Jenkins job from AssetRails Console.
 
 
-##Folder format for make AssetBundle
-☆カテゴリー/バンドル名/素材 というフォーマットがある
-☆.metaがついているリソースを持ち込むことが可能
+
+##folder format supported
+Below is basic. but you can import your own prefabs and all Unity supported files,
+
+also **.meta** files too.
+
+![overview](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/overview.png "overview")
 
 
-##Manage AssetBundles
-☆使用するAssetBundleのリストが作れる(Unity5でデフォルトで入ったけどな！)
-☆プラットフォーム、バージョンごとにAssetBundleを保持
-☆過去作ったAssetBundleを管理することが出来る
-☆VersionedPool(AssetRails) 出力場所を表す記述
+##manage AssetBundles
+###Generate AssetBundle-data-list by versioning.
+
+e.g.
+
+    {
+        "versioned": 1,
+        "AssetBundles": [
+            {
+                "bundleName": "characters_enemy.assetBundle",
+                "revision": 1,
+                "resourceNames": [
+                    "texture",
+                    "enemy_material",
+                    "enemy_prefab"
+                ],
+                "size": 727140,
+                "crc": 235040124
+            },
+            {
+                "bundleName": "characters_hero.assetBundle",
+                "revision": 1,
+                "resourceNames": [
+                    "texture",
+                    "hero_material",
+                    "hero_prefab"
+                ],
+                "size": 727140,
+                "crc": 2232339018
+            }
+        ]
+    }	
+
+full example is in [Sample project](https://github.com/sassembla/AssetRails-Support/tree/master/Samples/AssetBundleReaderProject).
+
+###fast multi platform bundlize & manage support 
+generate & hold versioned-AssetBundles for each platform.
+
+###use inherited AssetBundles supported.
+You can use new version of versioned-AssetBundles group with old versioned-AssetBundles.
+
+e.g.
+
+	/Applications/Unity/Unity.app/Contents/MacOS/Unity -batchmode\
+	 -quit -projectPath $(pwd)\
+	 -executeMethod AssetRailsController.Versioning -v 2 -p iPhone\
+	 -b 1
+
+see [versioning in deep](https://github.com/sassembla/AssetRails-Support/blob/master/Versioning.md#versioning-in-deep).
+
 
 
 #Caution
-☆AssetRails can only run under メタがでてくるモード。
-☆AssetBundleを作るにはUnityのProライセンスとかが必要です。このAssetはそのへんを回避するものでは無いです。
-☆Unity5での動作はbeta中は未保証だよっ
+* AssetRails can only run under メタがでてくるモード。
+* This Asset is not for generating AssetBundles without Unity Pro license.
+* Unity5 is beta support.
 
 
 ##Online Support
