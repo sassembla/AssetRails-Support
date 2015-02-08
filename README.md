@@ -4,10 +4,9 @@ what is this:
 -> the tool for generating AssetBundle.
 
 
-##Generate AssetBundles from data
-☆PROJECT_FOLDER/Resources(AssetRails) からAssetBundleを作り、PROJECT_FOLDER/VersionedPool(AssetRails)に貯蓄する。
-☆Resources(AssetRails)内のフォルダ構造と、VersionedPool(AssetRails)の構造をbefore -> afterみたいに表示したい。
+##Generate AssetBundles from data gradually.
 
+![Qiita](http://qiita.com/icons/favicons/public/apple-touch-icon.png "Qiita")
 
 
 ##using command line
