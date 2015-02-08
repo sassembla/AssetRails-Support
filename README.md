@@ -5,7 +5,7 @@ what is this:
 
 ![jenkins](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/webInterface.png "jenkins")
 
-##as command line tool
+##AssetBundle Generator as a command line tool
 
 Like this.
 
@@ -31,7 +31,7 @@ You can programming it's runner.
 AssetRails has browser interface.  
 ![jenkins](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/webInterface.png "jenkins")
 
-Also you can run Jenkins job from AssetRails Console if AssetRails is under the Jenkins.
+Also you can run Jenkins job from AssetRails Console if AssetRails contained project is under the Jenkins.
 
 
 

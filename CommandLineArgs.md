@@ -258,7 +258,7 @@ Also can use absolute path.
 		
 		/a/b/c => /a/b/c
 		
-##Not only for AssetBundle, Use another format.
-Specially "versioning" & "bundlize" has the functionality for generating & driving with AssetBundles(of Unity).
+##Not only for AssetBundle
+Specially "bundlize" route has the functionality for generating Unity's AssetBundles.
 
-Although, you can generate "Not" AssetBundle format and pool these data files.
+Although, you can generate "Not" AssetBundle format in "bundlize" route.
