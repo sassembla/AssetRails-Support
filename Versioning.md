@@ -12,8 +12,7 @@ The "versioning" route outputs the "versioned" AssetBundles datas to below place
 
 	PROJECT_FOLDER/VersionedPool(AssetRails)/
 
-☆図示、version/プラットフォームごと/AssetBundles、あとリスト
-書いた。
+![versionedBase](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/versionedBase.png "versionedBase")
 
 This pool structure helps you:
 
@@ -25,9 +24,6 @@ This pool structure helps you:
 
 Here is versioning-d folder, there are "versioned" AssetBundles in folder and also "versionedList.json" is exists.
 
-☆AssetBunle x n とlistの中身
-書いた。
-
 versionedList.json contains the data like below.
 
 versionedList.json
@@ -37,7 +33,7 @@ versionedList.json
 		"AssetBundles": [
 			{
 				"bundleName": "A.assetBundle",
-				"version": 1,
+				"revision": 1,
 				"resourceNames": [
 					"texture",
 					"enemy"
@@ -58,13 +54,18 @@ versionedList.json
 		]
 	}
 	
-この辺に図解
 
 name | detail
 ---|---
-version | which version is contained this AssetBundle first, and also when the AssetBundle was last updated at version.
+versioned | version of AssetBundles.
+AssetBundles | the list of AssetBundle's info.
+
+
+name | detail
+---|---
 bundleName | the name of AssetBundle file.
-size | the size of AssetBundle file
+revision | when this AssetBundle was contained first, and also when the AssetBundle was last updated.
+size | the size of AssetBundle file. actual size or compressed. see 
 crc | the crc of AssetBundle which written by Unity.
 resourceNames | the list of resource-names of bundled in this AssetBundle.
 
@@ -82,17 +83,13 @@ although almost the resource which players already downloaded is still relevant.
 If you have old-versioned AssetBundles (assume that version is "1"),
 You can create The version "2" AssetBundles from combination of the version "1"'s AssetBundles + new additional AssetBundles.
 
-☆フォルダ絵、古いバージョンのAssetBundles1を持っていて、AssetBundle AとBがある。新version 2では、それにCをくわえたものにする。
-A, B, C P25の左半分
+
+![append](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/versionedAppend.png "append")
 
 sample command line is like below.
 
 	-executeMethod AssetRailsController.Versioning\
 		-v 2 -p iPhone --base-version 1
-
-☆リストも更新されるが、古いAssetBundlesにはそのversionがくっつけられる。
-その結果で出来るversion 2のフォルダの内容とリスト
-P25
 
 
 ##Overwrite the old AssetBundles by new AssetBundles
@@ -100,8 +97,7 @@ If version 1 contains AssetBundle named "A.assetBundle", and also new AssetBundl
 
 the "A.assetBundle" will be overwritten by new version, in this case it is **"version 2"**.
 
-☆フォルダの様子、リストの様子
-書いた奴の変更でいける
+![update](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/versionedUpdate.png "update")
 
 ##Combine, but also exclude specific AssetBundles to new version
 Another case, if you don't want to include "version 1"'s AssetBundle "A.assetBundle" anymore,
@@ -109,7 +105,7 @@ you can exclude it by -e --exclude-assets option and specific list file of bundl
 
 PROJECT_FOLDER/exclude.json
 
-	["A.assetBundle"]
+	["enemy.asset"]
 	
 
 And sample command line is below,
@@ -120,7 +116,6 @@ And sample command line is below,
 
 will generate these files & versionedList.json.
 
+![exclude](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/versionedExclude.png "exclude")
 
-☆フォルダの様子、リストの様子
-書いた奴の変更でいける
 
