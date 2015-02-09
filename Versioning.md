@@ -20,9 +20,9 @@ This pool structure helps you:
 * Combine a part of old AssetBundles and new AssetBundles to "new version"
 
 
-##Bundle AssetBundles to the "version" includes "versionedList.json"
+##"versionedList.json" data
 
-Here is versioning-d folder, there are "versioned" AssetBundles in folder and also "versionedList.json" is exists.
+There are "versioned" AssetBundles in version/platform folder and also "versionedList.json" is exists.
 
 versionedList.json contains the data like below.
 
@@ -43,7 +43,7 @@ versionedList.json
 			},
 			{
 				"bundleName": "B.assetBundle",
-				"version": 1,
+				"revision": 1,
 				"resourceNames": [
 					"texture",
 					"hero"
@@ -54,18 +54,20 @@ versionedList.json
 		]
 	}
 	
+parameter of versionedList itself:
 
 name | detail
 ---|---
 versioned | version of AssetBundles.
 AssetBundles | the list of AssetBundle's info.
 
+parameter of AssetBundle:
 
 name | detail
 ---|---
 bundleName | the name of AssetBundle file.
-revision | when this AssetBundle was contained first, and also when the AssetBundle was last updated.
-size | the size of AssetBundle file. actual size or compressed. see 
+revision | the number when this AssetBundle was contained first time, and also when the AssetBundle was last updated.
+size | the size of AssetBundle file. actual size or compressed. see [bundlize](https://github.com/sassembla/AssetRails-Support/blob/master/CommandLineArgs.md#bundlize)
 crc | the crc of AssetBundle which written by Unity.
 resourceNames | the list of resource-names of bundled in this AssetBundle.
 
@@ -106,7 +108,6 @@ you can exclude it by -e --exclude-assets option and specific list file of bundl
 PROJECT_FOLDER/exclude.json
 
 	["enemy.asset"]
-	
 
 And sample command line is below,
 
