@@ -1,0 +1,32 @@
+// everything is fixed as below, in this free version. pipelines are hardcoded.
+// please look commandline document. it's fun definitely.
+// https://github.com/sassembla/AssetRails-Support/blob/master/CommandLineArgs.md#assetrails-command-line-args
+
+// [
+//     {
+//         "clean": {}
+//     },
+//     {
+//         "import": {
+//             "-i": true
+//         }
+//     },
+//     {
+//         "prefabricate": {
+//             "-i": true
+//         }
+//     },
+//     {
+//         "bundlize": {
+//             "-i": true
+//         }
+//     },
+//     {
+//         "versioning": {
+//             "-i": true,
+//             "-v": 1,
+//             "-p": "WebPlayer",
+//             "-c": false
+//         }
+//     },
+// ]

@@ -1,0 +1,33 @@
+title = "planning multiple routes in order. but toml support is experimental."
+
+[clean]
+
+[import]
+dryrun = false
+info = true
+# order-by-bundle-name = true
+# source-path = "export/imported"
+# export-path = "export/imported"
+
+[prefabricate]
+dryrun = false
+info = true
+# source-path = "export/imported"
+# export-path = "export/prefabricated"
+
+[bundlize]
+dryrun = false
+info = true
+fast = true
+# source-path = "export/prefabricated"
+# export-path = "export/bundlized"
+
+[versioning]
+version = 1
+platform = "iPhone"
+# source-path = "export/bundlized"
+# base-version = 1
+# exclude-assets = "excludesJsonList.txt"
+crc = true
+# source-path = "export/bundlized"
+# export-path = "export/versioned"

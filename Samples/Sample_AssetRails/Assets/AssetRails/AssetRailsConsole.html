@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>AssetRails Console</title>
+		<meta charset="UTF-8" />
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+		<script type="text/javascript">
+			var basement = {
+				uri: 'ws://127.0.0.1:8825/',
+				jenkinsTrigger: "",
+				init : function (e) {
+
+					// AssetRails's log
+					var currentUrl = document.URL;
+					var targetLogBaseUrl = currentUrl.replace(/\/[^\/]*$/, '/');
+					var targetLogUrl = targetLogBaseUrl + "temp/AssetRailsLog.txt";
+
+					var logUrlLink = document.getElementById('assetRailsLogPath');
+					logUrlLink.onclick = function() {
+						window.location.href = targetLogUrl;
+					}
+					logUrlLink.className = "btn btn-xs btn-info";
+
+					// in jenkins deployment or not.
+					if (currentUrl.indexOf("/job/") != -1) {
+						var re = new RegExp("(.*/job/.*?)/.*");
+						var result = currentUrl.match(re);
+						if (result) {
+							basement.jenkinsTrigger = result[1] + "/build?delay=0sec";
+							basement.replaceContents("runJenkins", "run jenkins job");
+							
+							var runJenkinsJobObj = document.getElementById('runJenkins');
+
+							runJenkinsJobObj.onclick = function() {
+								var run = confirm('start jenkins job:' + basement.jenkinsTrigger);
+								
+								if (!run) return;
+
+								$.ajax(
+									{
+										url: basement.jenkinsTrigger,
+										success: function(result){},
+										error: function(result){
+											alert('this html is not under control of jenkins.');
+										}
+									}
+								);
+							};
+
+							runJenkinsJobObj.className = "btn btn-xs btn-info";
+						}
+					} else {
+						basement.replaceContents("runJenkins", "cannot run jenkins job");
+						var runJenkinsJobObj = document.getElementById('runJenkins');
+						runJenkinsJobObj.className = "btn btn-xs btn-default";
+					}
+
+					// Unity Editor's log R-EPLACABLE_UNITY_LOG_PATH
+					var logUrl = "/Users/illusionismine/Library/Logs/Unity/Editor.log";
+					var editorLogButonObl = document.getElementById('unityLogPath');
+						
+					if (currentUrl.indexOf("file:///") != -1) {// under file protocol.
+						editorLogButonObl.className = "btn btn-xs btn-info";
+						editorLogButonObl.onclick = function() {
+							window.location.href = logUrl;
+						}
+						
+					} else {
+						editorLogButonObl.className = "btn btn-xs btn-info";
+						editorLogButonObl.onclick = function() {
+							window.alert("Unity Editor log:\n" + "file://" + logUrl + "\n" + "please copy & paste to other tab for see it.");
+						}
+					}
+					
+
+
+					basement.reinit(e);
+				},
+				reinit : function (e) {
+					basement.socket = new WebSocket(basement.uri);
+					basement.socket.onopen = function (e) { basement.onOpen(e); };
+					basement.socket.onclose = function (e) { basement.onClose(e); };
+					basement.socket.onmessage = function (e) { basement.onMessage(e); };
+					basement.socket.onerror = function (e) { basement.onError(e); };
+				},
+
+				onOpen: function () {
+					basement.replaceContents("connectStatus", '<span class="glyphicon glyphicon-ok-sign">Connected</span>');
+
+					basement.request('import');
+					basement.request('prefabricate');
+					basement.request('bundlize');
+					basement.request('versioning');
+
+
+					basement.progress('import', "0");
+					basement.progress('prefabricate', "0");
+					basement.progress('bundlize', "0");
+					basement.progress('versioning', "0");
+				},
+
+				onClose: function () {
+					basement.replaceContents("connectStatus", '<span class="glyphicon glyphicon-refresh">Reconnecting..</span>');
+					
+					basement.socket.onopen = function () {};
+					basement.socket.onclose = function () {};
+					basement.socket.onmessage = function () {};
+					basement.socket.onerror = function () {};
+
+					// reconnection
+					setTimeout(basement.reinit, 1000);
+				},
+
+				onMessage: function (e) {
+					var result = e.data;
+
+					// route everything. if not matched, ignore.
+					if (result.indexOf("push:") == 0) {
+						var route = result.substring("push:".length);
+
+						var signableRoutes = ["import", "prefabricate", "bundlize", "versioning"];
+						if (- 1 < signableRoutes.indexOf(route)) {
+							basement.replaceContents(route + "_button", "<button onclick=\"basement.showHide('" + route + "')\" type='button' class='btn btn-info'>" + route + "</button>");
+						}
+					}
+
+					// progress
+					if (result.indexOf("progress:") == 0) {
+						var routeAndPercentage = result.substring("progress:".length).split(":");
+						var route = routeAndPercentage[0];
+						var percentage = routeAndPercentage[1];
+						
+						if (route == "clean") {
+							basement.progress("import", 0);
+							basement.progress("prefabricate", 0);
+							basement.progress("bundlize", 0);
+							basement.progress("versioning", 0);
+
+							basement.setEmpty("import");
+							basement.setEmpty("prefabricate");
+							basement.setEmpty("bundlize");
+							basement.setEmpty("versioning");
+
+							return;
+						}
+
+						basement.progress(route, percentage);
+						return;
+					}
+
+					// route series
+					{
+						if (result.indexOf("import:") == 0) {
+							var jsonStr = result.substring("import:".length);
+
+							var data;
+							var route = "import";
+							{
+								if (jsonStr.length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+
+								if (jsonStr === "running...") {
+									basement.replaceContents(route, "running...");
+									return;
+								}
+
+								data = JSON.parse(jsonStr);
+								
+								if(Object.getOwnPropertyNames(data).length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+							}
+
+							basement.clearContents(route);
+
+							for (var category in data) {
+								var categoryBox = "<span class='label label-danger'>" + category + "</span>";
+								for (var bundleName in data[category]) {
+									var bundleBox = "";
+
+									for (var resourceName in data[category][bundleName]) {
+										bundleBox += basement.container("<h4 style=' margin-top: 5px; margin-bottom: 5px; '><span class='label label-info'>" + data[category][bundleName][resourceName] + "</span></h4>");
+									}
+
+									categoryBox += basement.container("<span class='label label-warning'>" + bundleName + "</span>" + bundleBox + "<br/>");
+								}
+
+								basement.appendContents(route, basement.container(categoryBox));
+								basement.appendContents(route, "<br/>");
+							}
+
+							basement.replaceContents(route + "_button", "<button onclick=\"basement.showHide('" + route + "')\" type='button' class='btn btn-primary'>" + route + "</button>");
+							return;
+						}
+
+						if (result.indexOf("prefabricate:") == 0) {
+							var jsonStr = result.substring("prefabricate:".length);
+
+							var data;
+							var route = "prefabricate";
+							{
+								if (jsonStr.length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+
+								if (jsonStr === "running...") {
+									basement.replaceContents(route, "running...");
+									return;
+								}
+
+								data = JSON.parse(jsonStr);
+								
+								if(Object.getOwnPropertyNames(data).length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+							}
+
+							basement.clearContents(route);
+
+							for (var category in data) {
+								var categoryBox = "<span class='label label-danger'>" + category + "</span>";
+								for (var bundleName in data[category]) {
+									var bundleBox = "";
+
+									for (var resourceName in data[category][bundleName]) {
+										bundleBox += basement.container("<h4 style=' margin-top: 5px; margin-bottom: 5px; '><span class='label label-info'>" + data[category][bundleName][resourceName] + "</span></h4>");
+									}
+
+									categoryBox += basement.container("<span class='label label-warning'>" + bundleName + "</span>" + bundleBox + "<br/>");
+								}
+
+								basement.appendContents(route, basement.container(categoryBox));
+								basement.appendContents(route, "<br/>");
+							}
+
+							basement.replaceContents(route + "_button", "<button onclick=\"basement.showHide('" + route + "')\" type='button' class='btn btn-primary'>" + route + "</button>");
+							return;
+						}
+
+						if (result.indexOf("bundlize:") == 0) {
+							var jsonStr = result.substring("bundlize:".length);
+							// platform/ name/ res,size,crc
+							
+							var data;
+							var route = "bundlize";
+							{
+								if (jsonStr.length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+
+								if (jsonStr === "running...") {
+									basement.replaceContents(route, "running...");
+									return;
+								}
+
+								data = JSON.parse(jsonStr);
+								
+								if(Object.getOwnPropertyNames(data).length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+							}
+
+							basement.clearContents(route);
+
+							for (var platform in data) {
+								var bundleBox = "";
+
+								for (var bundleName in data[platform]) {
+									
+									var bundleData = data[platform][bundleName]
+									
+									bundleBox += basement.container(
+										"<h4><span class='label label-warning'>" + bundleName + "</span></h4>"
+										 // + "version:" + bundleData.version
+										 + 
+										basement.container(
+											"<p style=' font-size:12px; color: #0d0d0d; '>"
+											 + "resourceNames:[" + bundleData.resourceNames.join(", ") + "]"
+											 + " size:" + bundleData.size
+											 + " crc:" + bundleData.crc
+											 + "</p>"
+										)
+									);
+								}
+								var platformBox = basement.container("<span class='label label-danger'>" + platform + "</span>" + bundleBox + "<br/>");
+								
+								basement.appendContents(route, basement.container(platformBox));
+								basement.appendContents(route, "<br/>");
+							}
+
+
+							basement.replaceContents(route + "_button", "<button onclick=\"basement.showHide('" + route + "')\" type='button' class='btn btn-primary'>" + route + "</button>");
+							return;
+						}
+
+						if (result.indexOf("versioning:") == 0) {
+							var jsonStr = result.substring("versioning:".length);
+
+							var data;
+							var route = "versioning";
+							{
+								if (jsonStr.length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+
+								if (jsonStr === "running...") {
+									basement.replaceContents(route, "running...");
+									return;
+								}
+
+								data = JSON.parse(jsonStr);
+								
+								if(Object.getOwnPropertyNames(data).length === 0) {
+									basement.setEmpty(route);
+									return;
+								}
+							}
+
+							basement.clearContents(route);
+
+							for (var version in data) {
+								var versionBox = "<span class='label label-danger'>" + version + "</span>";
+								
+								for (var platform in data[version]) {
+									var platformBox = "";
+
+									for (var bundleName in data[version][platform]) {
+										
+										var bundleData = data[version][platform][bundleName]
+										var info = "<p style=' font-size:12px; color: #0d0d0d; '>"
+											 + "revision:" + bundleData.revision
+											 + " resourceNames:[" + bundleData.resourceNames.join(", ") + "]"
+											 + " size:" + bundleData.size
+											 + " crc:" + bundleData.crc
+											 + "</p>";
+
+										if (bundleData.version === "no data") {
+											info = "<p style=' font-size:12px; color: #ff0505; '>" + "error: no assetbundle data in this version." + "</p>";
+										}
+
+										platformBox += basement.container(
+											"<h4><span class='label label-info'>" + bundleName + "</span></h4>"
+											 + basement.container(info)
+										);
+									}
+									versionBox += basement.container("<span class='label label-warning'>" + platform + "</span>" + platformBox + "<br/>");
+								}
+								basement.appendContents(route, basement.container(versionBox));
+								basement.appendContents(route, "<br/>");
+							}
+
+							basement.replaceContents(route + "_button", "<button onclick=\"basement.showHide('" + route + "')\" type='button' class='btn btn-primary'>" + route + "</button>");
+							return;
+						}
+					}
+
+					if (result.indexOf("log:") == 0) {
+						var statusAndMessage = result.substring("log:".length);
+						var index = statusAndMessage.indexOf(":");
+						
+						var status = statusAndMessage.substring(0, index);
+						var message = statusAndMessage.substring(index + 1);
+						
+						switch (status) {
+							case "Log": {
+								basement.insertContents("log", "<p style=' font-size:14px; color: #555; margin-bottom: 0px; white-space: pre; '>" + message + "</p>");
+								break;
+							}
+							case "Warning": {
+								basement.insertContents("log", "<p style=' font-size:14px; color: #c6851e; margin-bottom: 0px; white-space: pre; '>" + message + "</p>");
+								break;
+							}
+							case "Error": {
+								basement.insertContents("log", "<p style=' font-size:14px; color: #ff0505; margin-bottom: 0px; white-space: pre; '>" + message + "</p>");
+								break;
+							}
+							case "Exception": {
+								basement.insertContents("log", "<p style=' font-size:14px; color: #ff0505; margin-bottom: 0px; white-space: pre; '>" + message + "</p>");
+								break;
+							}
+							case "Assert": {
+								basement.insertContents("log", "<p style=' font-size:14px; color: #ff0505; margin-bottom: 0px; white-space: pre; '>" + message + "</p>");
+								break;
+							}
+							default: {
+								basement.insertContents("log", "<p style=' font-size:14px; color: #000; margin-bottom: 0px; white-space: pre; '>" + message + "</p>");
+								break;
+							}
+						}
+						return;
+					}
+				},
+
+				onError: function (e) {
+					basement.replaceContents("connectStatus", '<span class="glyphicon glyphicon-refresh">Reconnecting..</span>' + e.data);
+				},
+
+
+				//Methods
+				/*
+					write textlist
+				*/
+				appendContents: function (type, message) {
+					var childNodes = document.getElementById(type).childNodes;
+					var p = document.createElement('p');
+					p.style.wordWrap = 'break-word';
+					p.style.marginBottom = '5px';
+					p.innerHTML = message.toString();
+					document.getElementById(type).appendChild(p);
+				},
+
+				insertContents: function (type, message) {
+					var childNodes = document.getElementById(type).childNodes;
+					var p = document.createElement('p');
+					p.style.wordWrap = 'break-word';
+					p.style.marginBottom = '5px';
+					p.innerHTML = message.toString();
+					document.getElementById(type).insertBefore(p, childNodes[0]);
+				},
+
+				replaceContents: function (type, message) {
+					basement.clearContents(type);
+					var p = document.createElement('p');
+					p.style.wordWrap = 'break-word';
+					p.style.marginBottom = '0px';
+					p.innerHTML = message.toString();
+					var elem = document.getElementById(type);
+					if (elem) {
+						elem.appendChild(p);
+					}
+				},
+
+				clearContents: function (type) {
+					var elem = document.getElementById(type);
+					if (elem) {
+						while (elem.hasChildNodes()){
+							elem.removeChild(elem.lastChild);
+						}
+					}
+				},
+
+				setEmpty: function (type) {
+					basement.replaceContents(type, "no data.");
+					basement.replaceContents(type + "_button", "<button onclick=\"basement.showHide('" + type + "')\" type='button' class='btn btn-default'>" + type + "</button>");
+				},
+
+				container: function (contain) {
+					return "<div class='container'>" + contain + "</div>";
+				},
+
+				request: function (type) {
+					basement.socket.send(type);
+				},
+
+				showHide: function (type) {
+					if (document.getElementById(type).style.display === "none") {
+						document.getElementById(type).style.display = "block";
+						basement.replaceContents(type+"_showHide", '-');
+					} else {
+						document.getElementById(type).style.display = "none";
+						basement.replaceContents(type+"_showHide", '+');
+					}
+				},
+
+				progress: function (route, percentage) {
+					var e = document.getElementById(route + "_progress");
+					e.style.width = percentage + "%";
+					e.innerHTML = percentage + "%";
+
+					if (percentage === "100") {
+						var parent = e.parentNode;
+						if (parent) {
+							parent.className = "progress";
+							e.className = "progress-bar progress-bar-success";
+						}
+					} else if (percentage === "0") {
+						var parent = e.parentNode;
+						if (parent) {
+							parent.className = "progress progress-striped";
+							e.className = "progress-bar";
+						}
+					}
+				},
+
+				touch: function (url) {
+					console.log("url:" + url);
+				}
+			};
+
+			window.addEventListener('load', basement.init, false);
+
+		</script>
+	</head>
+
+	<body>
+		<div class="container" role="main">
+			<div style="float:right;"><h5 id="connectStatus"><span class="glyphicon glyphicon-refresh">Reconnecting..</span></h4></div>
+
+			<ul class="nav nav-tabs" role="tablist" style=" padding-top: 10px; ">
+				<li role="presentation" class="active">
+					<a href="#routes">AssetRails Routes</a>
+				</li>
+
+
+				<li role="presentation">
+					<button id="assetRailsLogPath" onclick="" type="button" class="btn btn-xs btn-default" style=" margin-top: 10px; margin-left: 10px; ">temp/AssetRailsLog.txt</button>
+				</li>
+
+				<li role="presentation">
+					<button id="unityLogPath" onclick="" type="button" class="btn btn-xs btn-default" style=" margin-top: 10px; margin-left: 10px; ">UnityEditor.log</button>
+				</li>
+
+				<li role="presentation">
+					<button id="runJenkins" onclick="" type="button" class="btn btn-xs btn-default" style=" margin-top: 10px; margin-left: 10px; ">cannot run jenkins job</button>
+				</li>
+
+			</ul>
+
+			<div class="container" style=" margin-bottom: 20px; ">
+				<div style="margin-top: 10px" id="import_button">
+					<button onclick="basement.showHide('import')" type='button' class='btn btn-default'>import</button>
+				</div>
+				<div class="progress progress-striped" style=" margin-top: 5px; margin-bottom: 5px; ">
+					<div class="progress-bar" style="width: 0%;" id="import_progress"></div>
+				</div>				
+				<div id="import">no report.</div>
+			</div>
+
+			<div class="container" style=" margin-bottom: 20px; ">
+				<div style="margin-top: 10px" id="prefabricate_button">
+					<button onclick="basement.showHide('prefabricate')" type='button' class='btn btn-default'>prefabricate</button>
+				</div>
+				<div class="progress progress-striped" style=" margin-top: 5px; margin-bottom: 5px; ">
+					<div class="progress-bar" style="width: 0%;" id="prefabricate_progress"></div>
+				</div>				
+				<div id="prefabricate">no report.</div>
+			</div>
+			
+			<div class="container" style=" margin-bottom: 20px; ">
+				<div style="margin-top: 10px" id="bundlize_button">
+					<button onclick="basement.showHide('bundlize')" type='button' class='btn btn-default'>bundlize</button>
+				</div>
+				<div class="progress progress-striped" style=" margin-top: 5px; margin-bottom: 5px; ">
+					<div class="progress-bar" style="width: 0%;" id="bundlize_progress"></div>
+				</div>				
+				<div id="bundlize">no report.</div>
+			</div>			
+
+			<div class="container" style=" margin-bottom: 20px; ">
+				<div style="margin-top: 10px" id="versioning_button">
+					<button onclick="basement.showHide('versioning')" type='button' class='btn btn-default'>versioning</button>
+				</div>
+				<div class="progress progress-striped" style=" margin-top: 5px; margin-bottom: 5px; ">
+					<div class="progress-bar" style="width: 0%;" id="versioning_progress"></div>
+				</div>				
+				<div id="versioning">no report.</div>
+			</div>			
+
+			<div class="page-header">logs</div>
+			<div class="jumbotron" style=" padding-top: 10px; padding-bottom: 10px; padding-left: 20px; padding-right: 20px; ">
+				
+				<p id="log"></p>
+			</div>
+		</div>
+	</body>
+</html>
+
