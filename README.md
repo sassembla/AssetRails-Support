@@ -99,7 +99,7 @@ see [versioning in deep](https://github.com/sassembla/AssetRails-Support/blob/ma
 
 
 #Caution
-* AssetRails can only run under "External Version Control Support = isible Meta Files".
+* AssetRails can only run under "External Version Control Support = visible Meta Files".
 * This Asset is **not** for generating AssetBundles without Unity Pro license.
 
 
