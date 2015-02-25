@@ -26,7 +26,10 @@ from command line,
 in PROJECT_FOLDER,
 
 	Mac:
-	sh Assets/AssetRails/Samples/ShellScript/run.sh
+		sh Assets/AssetRails/Samples/ShellScript/run.sh
+	
+	Windows:
+		"Assets\AssetRails\SampleScripts\Bat\run.bat"
 
 
 from command line via Jenkins,
@@ -41,10 +44,10 @@ add
 	cd PROJECT_FOLDER
 
 	Mac:
-	sh Assets/AssetRails/Samples/ShellScript/run.sh
+		sh Assets/AssetRails/Samples/ShellScript/run.sh
 	
 	Windows:
-	
+		"Assets\AssetRails\SampleScripts\Bat\run.bat"
 	
 	
 ![jenkins job](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/jenkins.png "jenkins job")
