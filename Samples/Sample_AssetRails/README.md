@@ -1,65 +1,91 @@
 #AssetRails Overview
 
+[http://u3d.as/content/sassembla/asset-rails](http://u3d.as/content/sassembla/asset-rails)
+
 what is this:  
--> Generating AssetBundles from **command line** and CI(e.g. Jenkins).
+-> Tool for generating AssetBundles from **command line** and CI(e.g. Jenkins).
 
 ![jenkins](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/webInterface.png "jenkins")
 
 ##AssetBundle Generator as a command line tool
 
-Like this.
+command line for Mac:
 
 	/Applications/Unity/Unity.app/Contents/MacOS/Unity -batchmode\
 	 -quit -projectPath $(pwd)\
 	 -executeMethod AssetRailsController.Bundlize
 
 
-[online command line args document](https://github.com/sassembla/AssetRails-Support/blob/master/CommandLineArgs.md#assetrails-command-line-args)
+[command line args document](https://github.com/sassembla/AssetRails-Support/blob/master/CommandLineArgs.md#assetrails-command-line-args)
 
-##sample usage
-from command line,
+##Trial version
+Please try AssetRails with free version.
 
-* decompress "PROJECT_FOLDER/AssetRails/Samples/Resources(AssetRails).zip"
-* move opened "Resources(AssetRails)" folder into PROJECT_FOLDER/
-* running command line
+[Trial version of AssetRails](https://github.com/sassembla/AssetRails-Support/tree/master/Samples/Sample_AssetRails)
 
-in PROJECT_FOLDER,
+
+##Sample usage
+####From command line
+from command line, you can generate AssetBundles from sample resources in 4 step.
+
+
+1. decompress "PROJECT_FOLDER/AssetRails/Samples/Resources(AssetRails).zip"
+1. move opened "Resources(AssetRails)" folder into PROJECT_FOLDER/
+1. open Assets/AssetRails/AssetRailsConsole.html
+1. running command line
+
+in PROJECT_FOLDER, 
 
 	Mac:
-	sh Assets/AssetRails/Samples/ShellScript/run.sh
+		sh Assets/AssetRails/Samples/ShellScript/run.sh
+	
+	Windows:
+		"Assets\AssetRails\SampleScripts\Bat\run.bat"
 
 
-from command line via Jenkins,
 
-* setupt Jenkins first.
-* create new Jenkins job. for example new job name is "AssetRailsBuild".
-* move PROJECT_FOLDER which includes AssetRails into Jenkins's job workspace folder.
-	e.g. "/Users/Shared/Jenkins/Home/jobs/AssetRailsBuild/workspace/"
-* in Jenkins setting, setup run shell or bat like below.
-add 
+you can see progress of generating!
+
+####From Jenkins
+here is generate AssetBundles via Jenkins in 5 steps.
+
+1. setup Jenkins first.
+1. create new Jenkins job.
+1. move the project which contains AssetRails into Jenkins's job workspace folder.
+	e.g. "/Users/Shared/Jenkins/Home/jobs/JENKINS_JOB/workspace/PROJECT_FOLDER/AssetRails"
+
+1. in Jenkins setting, setup shell script or batch file like below.
+
+run scripts from PROJECT_FOLDER.
 
 	cd PROJECT_FOLDER
 
 	Mac:
-	sh Assets/AssetRails/Samples/ShellScript/run.sh
+		sh Assets/AssetRails/Samples/ShellScript/run.sh
 	
 	Windows:
-	
-	
-	
-![jenkins job](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/jenkins.png "jenkins job")
+		"Assets\AssetRails\SampleScripts\Bat\run.bat"
+		
++5. open Assets/AssetRails/AssetRailsConsole.html from Jenkins's workspace in browser.
+
+	http://URL_OF_JENKINS_JOB/ws/AssetRails/AssetRailsConsole.html
+
+That's all!
 
 
-##build pipeline
+##Build pipeline
 You can construct pipeline which called "route".
 
 * import, prefabricate, bundlize, versioning.
 * Run multiple routes in order.
-Supported format is json & toml(experimental).
+Supported order format is json & toml(experimental).
+
+[command line args document](https://github.com/sassembla/AssetRails-Support/blob/master/CommandLineArgs.md#assetrails-command-line-args)
 
 * AssetRails has Runner-API for each route.
 You can programming it's runner.
 
+[runners API document](https://github.com/sassembla/AssetRails-Support/blob/master/RunnersAPIDocument.md#assetrails-runners-api-document)
 
 ##Web console & run Jenkins job
 AssetRails has browser interface.  
@@ -69,15 +95,15 @@ Also you can run Jenkins job from AssetRails Console if AssetRails contained pro
 
 
 
-##folder format supported
-Below is default folder format for AssetRails. but you can import your own data format which is supported by Unity,
-
-also **.meta** files too.
+##Folder format
+Below is default folder-format for AssetRails.  
+You can import every data which is supported by Unity,  
+including **.meta** files too.
 
 ![overview](https://raw.githubusercontent.com/sassembla/AssetRails-Support/master/image/overview.png "overview")
 
 
-##manage AssetBundles
+##Manage AssetBundles
 ###Generate AssetBundle-data-list by versioning.
 
 versionedList.json

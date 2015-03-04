@@ -1,7 +1,7 @@
-#Sample project for AssetRails output
+#Sample project for loading AssetBundles which made by AssetRails output
 
 
-##sample usage
+##Sample usage
 * open Assets/SampleAssetBundleLoader.unity
 * Play
 
@@ -9,7 +9,7 @@ will load AssetBundles data list from **"AssetBundleReaderProject/VersionedPool(
 
  then load and open these AssetBundles from folder.
 
-##caution
+##Caution
 These AssetBundles were built by Unity 4.3.x, which has no-compatibility to Unity 4.5.x, 4.6.x, 5.0.x(beta).
 
 And
@@ -21,5 +21,3 @@ Defined by below.
 
 
 	public const string PLATFORM_STR = "iPhone";
-	
-Please set it to "WebPlayer" for WebPlayer play.
