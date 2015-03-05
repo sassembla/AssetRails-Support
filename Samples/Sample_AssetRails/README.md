@@ -72,6 +72,9 @@ run scripts from PROJECT_FOLDER.
 
 That's all!
 
+##Loading sample
+here is the example implementation for downloading & using the AssetBundles which derived from the AssetRails.  
+[Samples/AssetBundleReaderProject](https://github.com/sassembla/AssetRails-Support/tree/master/Samples/AssetBundleReaderProject)
 
 ##Build pipeline
 You can construct pipeline which called "route".
