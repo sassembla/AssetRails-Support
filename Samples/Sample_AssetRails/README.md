@@ -1,5 +1,7 @@
 #AssetRails Overview
 
+ver 1.0.0
+
 [http://u3d.as/content/sassembla/asset-rails](http://u3d.as/content/sassembla/asset-rails)
 
 what is this:  
@@ -158,7 +160,7 @@ see [versioning in deep](https://github.com/sassembla/AssetRails-Support/blob/ma
 
 
 #Future
-* Unity5 is beta support. but You can use this Asset with Unity 5's new feature, maybe.
+* Writing AssetBundle's dependency graph will be supported.
 
 
 #Caution
