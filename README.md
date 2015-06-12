@@ -31,7 +31,7 @@ Please try AssetRails with free version.
 from command line, you can generate AssetBundles from sample resources in 4 step.
 
 
-1. decompress "PROJECT_FOLDER/AssetRails/Samples/Resources(AssetRails).zip"
+1. decompress "PROJECT_FOLDER/Assets/AssetRails/Samples/Resources(AssetRails).zip"
 1. move opened "Resources(AssetRails)" folder into PROJECT_FOLDER/
 1. open Assets/AssetRails/AssetRailsConsole.html
 1. running command line
